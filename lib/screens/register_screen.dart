@@ -53,6 +53,66 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                 ),
                 const SizedBox(height: 40),
+
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      _buildField(
+                        controller: _nameController,
+                        hint: 'Enter your full name',
+                      ),
+                      const SizedBox(height: 16),
+
+                      _buildField(
+                        controller: _mobileController,
+                        hint: 'Enter your mobile number',
+                        keyboardType: TextInputType.phone,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter mobile number';
+                          }
+                          if (value.length < 10) {
+                            return 'Mobile number must be at least 10 digits';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      _buildField(
+                        controller: _passwordController,
+                        hint: 'Enter your password',
+                        obscure: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter password';
+                          }
+                          if (value.length < 6) {
+                            return 'Password must be at least 6 characters';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      _buildField(
+                        controller: _confirmController,
+                        hint: 'Confirm password',
+                        obscure: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please confirm password';
+                          }
+                          if (value != _passwordController.text) {
+                            return 'Passwords do not match';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
               ],
             ),
           ),
