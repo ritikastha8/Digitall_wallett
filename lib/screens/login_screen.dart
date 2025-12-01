@@ -1,9 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_svg/svg.dart';
-
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -23,13 +20,28 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _onLoginPressed() {}
-  void _onForgotPassword() {}
-  void _onRegister() {}
+  void _onLoginPressed() {
+    if (!_formKey.currentState!.validate()) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Login button tapped (UI only)")),
+    );
+  }
+
+  void _onForgotPassword() {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Forgot Password tapped")));
+  }
+
+  void _onRegister() {
+    Navigator.pushNamed(context, '/register');
+  }
 
   @override
   Widget build(BuildContext context) {
     const orange = Color(0xFFD87920);
+
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -44,16 +56,21 @@ class _LoginScreenState extends State<LoginScreen> {
                   style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 36),
+
+                /// LOGO
+                // logo
                 Container(
                   padding: const EdgeInsets.only(top: 30),
                   alignment: Alignment.center,
                   child: SvgPicture.asset(
-                    "assets/images/logonovacash.svg",
-                    height: 150,
+                    "assets/images/logonovacash.svg", //  SVG file
+                    height: 150, // adjust size as needed
                   ),
                 ),
+
                 const SizedBox(height: 48),
 
+                /// FORM
                 Form(
                   key: _formKey,
                   child: Column(
@@ -124,7 +141,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                 ),
+
                 const SizedBox(height: 12),
+
                 Align(
                   alignment: Alignment.centerRight,
                   child: TextButton(
@@ -138,7 +157,10 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
+
                 const SizedBox(height: 8),
+
+                /// LOGIN BUTTON
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -158,6 +180,30 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                   ),
                 ),
+
+                const SizedBox(height: 20),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text(
+                      "Don’t have an account? ",
+                      style: TextStyle(color: Colors.black87),
+                    ),
+                    GestureDetector(
+                      onTap: _onRegister,
+                      child: const Text(
+                        'Register here',
+                        style: TextStyle(
+                          color: orange,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
               ],
             ),
           ),
