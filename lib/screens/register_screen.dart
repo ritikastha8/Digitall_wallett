@@ -24,7 +24,16 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
-  void _onRegisterPressed() {}
+  void _onRegisterPressed() {
+    if (!_formKey.currentState!.validate()) return;
+
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text("Registration submitted (UI only)")),
+    );
+
+    // Go back to login
+    Navigator.pushReplacementNamed(context, '/');
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -44,16 +53,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 32),
+
+                /// Logo
+                // Logo
                 Container(
                   padding: const EdgeInsets.only(top: 30),
                   alignment: Alignment.center,
                   child: SvgPicture.asset(
-                    "assets/images/logonovacash.svg",
-                    height: 150,
+                    "assets/images/logonovacash.svg", // your SVG file path
+                    height: 150, // adjust size as needed
                   ),
                 ),
+
                 const SizedBox(height: 40),
 
+                /// Form
                 Form(
                   key: _formKey,
                   child: Column(
@@ -115,6 +129,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
                 ),
 
                 const SizedBox(height: 24),
+
+                /// Register Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -134,11 +150,73 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     ),
                   ),
                 ),
+
+                const SizedBox(height: 20),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Already have an account?  '),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacementNamed(context, '/');
+                      },
+                      child: const Text(
+                        'Log In',
+                        style: TextStyle(
+                          color: orange,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  /// Reusable input field
+  Widget _buildField({
+    required TextEditingController controller,
+    required String hint,
+    bool obscure = false,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    const orange = Color(0xFFD87920);
+
+    return TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: const Color(0xFFF4F4F4),
+        hintText: hint,
+        hintStyle: const TextStyle(color: orange, fontSize: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      validator:
+          validator ??
+          (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Field required';
+            }
+            return null;
+          },
     );
   }
 }
