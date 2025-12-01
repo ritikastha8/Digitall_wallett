@@ -124,6 +124,40 @@ class _LoginScreenState extends State<LoginScreen> {
                     ],
                   ),
                 ),
+                const SizedBox(height: 12),
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: _onForgotPassword,
+                    child: const Text(
+                      "Forgot Password ?",
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 8),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: _onLoginPressed,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: orange,
+                      foregroundColor: Colors.white,
+                      shape: const StadiumBorder(),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                    ),
+                    child: const Text(
+                      'Log In',
+                      style: TextStyle(
+                        fontSize: 18,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
