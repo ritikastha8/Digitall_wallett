@@ -1,3 +1,5 @@
+import 'package:digital_wallett_system/screens/dashboard_screen.dart';
+import 'package:digital_wallett_system/screens/register_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -21,11 +23,29 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onLoginPressed() {
-    if (!_formKey.currentState!.validate()) return;
+    // Validate the form first
+    if (!_formKey.currentState!.validate()) {
+      // If validation fails, do nothing
+      return;
+    }
 
+    // Show success SnackBar
     ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Login button tapped (UI only)")),
+      const SnackBar(
+        content: Text("Login successful!"),
+        duration: Duration(seconds: 1),
+      ),
     );
+
+    // Navigate to HomeScreen after SnackBar disappears
+    Future.delayed(const Duration(seconds: 1), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => const HomeScreen(balance: 5000),
+        ),
+      );
+    });
   }
 
   void _onForgotPassword() {
@@ -35,14 +55,17 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _onRegister() {
-    Navigator.pushNamed(context, '/register');
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (context) => RegisterScreen()),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     const orange = Color(0xFFD87920);
-
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -166,7 +189,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   child: ElevatedButton(
                     onPressed: _onLoginPressed,
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: orange,
+                      backgroundColor: const Color.fromARGB(255, 216, 121, 32),
                       foregroundColor: Colors.white,
                       shape: const StadiumBorder(),
                       padding: const EdgeInsets.symmetric(vertical: 16),
