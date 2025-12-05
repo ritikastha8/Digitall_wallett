@@ -1,4 +1,6 @@
+import 'package:digital_wallett_system/screens/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 import '../models/onboard_model.dart';
 import '../widgets/onboard_widgets.dart';
@@ -60,6 +62,32 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                   ),
                 ),
                 const Spacer(),
+                SizedBox(
+                  height: 80,
+                  width: 80,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_pageIndex == demoData.length - 1) {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => const LoginScreen(),
+                          ),
+                        );
+                      } else {
+                        _pageController.nextPage(
+                          duration: const Duration(milliseconds: 300),
+                          curve: Curves.ease,
+                        );
+                      }
+                    },
+
+                    style: ElevatedButton.styleFrom(
+                      shape: const CircleBorder(),
+                    ),
+                    child: SvgPicture.asset("assets/icons/rightarroww.svg"),
+                  ),
+                ),
               ],
             ),
           ],
