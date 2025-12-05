@@ -1,4 +1,6 @@
+import 'package:digital_wallett_system/screens/login_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -23,8 +25,27 @@ class _RegisterScreenState extends State<RegisterScreen> {
     super.dispose();
   }
 
+  void _onRegisterPressed() {
+    if (!_formKey.currentState!.validate()) return;
+
+    // Show SnackBar first
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Registration successful!")));
+
+    // Wait for 1.5 seconds and then navigate to Login
+    Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
+    const orange = Color(0xFFD87920);
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -40,11 +61,152 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
                 ),
                 const SizedBox(height: 32),
+
+                /// Logo
+                // Logo
+                Container(
+                  padding: const EdgeInsets.only(top: 30),
+                  alignment: Alignment.center,
+                  child: SvgPicture.asset(
+                    "assets/images/logonovacash.svg", // your SVG file path
+                    height: 150, // adjust size as needed
+                  ),
+                ),
+
+                const SizedBox(height: 40),
+
+                /// Form
+                Form(
+                  key: _formKey,
+                  child: Column(
+                    children: [
+                      _buildField(
+                        controller: _nameController,
+                        hint: 'Enter your full name',
+                      ),
+                      const SizedBox(height: 16),
+
+                      _buildField(
+                        controller: _mobileController,
+                        hint: 'Enter your mobile number',
+                        keyboardType: TextInputType.phone,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter mobile number';
+                          }
+                          if (value.length < 10) {
+                            return 'Mobile number must be at least 10 digits';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      _buildField(
+                        controller: _passwordController,
+                        hint: 'Enter your password',
+                        obscure: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please enter password';
+                          }
+                          if (value.length < 6) {
+                            return 'Password must be at least 6 characters';
+                          }
+                          return null;
+                        },
+                      ),
+                      const SizedBox(height: 16),
+
+                      _buildField(
+                        controller: _confirmController,
+                        hint: 'Confirm password',
+                        obscure: true,
+                        validator: (value) {
+                          if (value == null || value.isEmpty) {
+                            return 'Please confirm password';
+                          }
+                          if (value != _passwordController.text) {
+                            return 'Passwords do not match';
+                          }
+                          return null;
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text('Already have an account?  '),
+                    GestureDetector(
+                      onTap: () {
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        );
+                      },
+                      child: const Text(
+                        'Log In',
+                        style: TextStyle(
+                          color: orange,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 24),
               ],
             ),
           ),
         ),
       ),
+    );
+  }
+
+  /// Reusable input field
+  Widget _buildField({
+    required TextEditingController controller,
+    required String hint,
+    bool obscure = false,
+    TextInputType keyboardType = TextInputType.text,
+    String? Function(String?)? validator,
+  }) {
+    const orange = Color(0xFFD87920);
+
+    return TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      keyboardType: keyboardType,
+      decoration: InputDecoration(
+        filled: true,
+        fillColor: const Color(0xFFF4F4F4),
+        hintText: hint,
+        hintStyle: const TextStyle(color: orange, fontSize: 16),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 20,
+          vertical: 16,
+        ),
+        border: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(8),
+          borderSide: BorderSide.none,
+        ),
+      ),
+      validator:
+          validator ??
+          (value) {
+            if (value == null || value.trim().isEmpty) {
+              return 'Field required';
+            }
+            return null;
+          },
     );
   }
 }
