@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -15,13 +16,22 @@ class _LoginScreenState extends State<LoginScreen> {
       body: SafeArea(
         child: Center(
           child: Column(
-            children: const [
+            children: [
               SizedBox(height: 16),
               Text(
                 'Log In',
                 style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
               ),
               SizedBox(height: 36),
+              Container(
+                padding: const EdgeInsets.only(top: 30),
+                alignment: Alignment.center,
+                child: SvgPicture.asset(
+                  "assets/images/logonovacash.svg",
+                  height: 150,
+                ),
+              ),
+              SizedBox(height: 48),
             ],
           ),
         ),
