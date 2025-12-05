@@ -1,3 +1,4 @@
+import 'package:digital_wallett_system/screens/login_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -27,12 +28,18 @@ class _RegisterScreenState extends State<RegisterScreen> {
   void _onRegisterPressed() {
     if (!_formKey.currentState!.validate()) return;
 
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text("Registration submitted (UI only)")),
-    );
+    // Show SnackBar first
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(const SnackBar(content: Text("Registration successful!")));
 
-    // Go back to login
-    Navigator.pushReplacementNamed(context, '/');
+    // Wait for 1.5 seconds and then navigate to Login
+    Future.delayed(const Duration(seconds: 1, milliseconds: 500), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const LoginScreen()),
+      );
+    });
   }
 
   @override
@@ -40,6 +47,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
     const orange = Color(0xFFD87920);
 
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Center(
           child: SingleChildScrollView(
@@ -159,7 +167,12 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     const Text('Already have an account?  '),
                     GestureDetector(
                       onTap: () {
-                        Navigator.pushReplacementNamed(context, '/');
+                        Navigator.pushReplacement(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const LoginScreen(),
+                          ),
+                        );
                       },
                       child: const Text(
                         'Log In',
