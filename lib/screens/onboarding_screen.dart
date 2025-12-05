@@ -50,6 +50,18 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
                 ),
               ),
             ),
+            Row(
+              children: [
+                ...List.generate(
+                  demoData.length,
+                  (index) => Padding(
+                    padding: const EdgeInsets.only(right: 4),
+                    child: DotIndicator(isActive: index == _pageIndex),
+                  ),
+                ),
+                const Spacer(),
+              ],
+            ),
           ],
         ),
       ),
