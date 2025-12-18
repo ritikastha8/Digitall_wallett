@@ -74,9 +74,9 @@ class _LoginScreenState extends State<LoginScreen> {
               mainAxisSize: MainAxisSize.min,
               children: [
                 const SizedBox(height: 16),
-                const Text(
+                Text(
                   'Log In',
-                  style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
+                  style: Theme.of(context).textTheme.headlineLarge,
                 ),
                 const SizedBox(height: 36),
 
@@ -102,21 +102,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _mobileController,
                         keyboardType: TextInputType.phone,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: const Color(0xFFF4F4F4),
+                          // filled: true,
+                          // fillColor: const Color(0xFFF4F4F4),
                           hintText: 'Enter your mobile number',
-                          hintStyle: const TextStyle(
-                            color: orange,
-                            fontSize: 16,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
-                          ),
+                          // hintStyle: const TextStyle(
+                          //   color: orange,
+                          //   fontSize: 16,
+                          // ),
+                          // contentPadding: const EdgeInsets.symmetric(
+                          //   horizontal: 20,
+                          //   vertical: 16,
+                          // ),
+                          // border: OutlineInputBorder(
+                          //   borderRadius: BorderRadius.circular(8),
+                          //   borderSide: BorderSide.none,
+                          // ),
                         ),
                         validator: (value) {
                           if (value == null || value.trim().isEmpty) {
@@ -194,7 +194,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       shape: const StadiumBorder(),
                       padding: const EdgeInsets.symmetric(vertical: 16),
                     ),
-                    child: const Text(
+                    child: Text(
                       'Log In',
                       style: TextStyle(
                         fontSize: 18,
@@ -209,14 +209,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Text(
+                    Text(
                       "Don’t have an account? ",
-                      style: TextStyle(color: Colors.black87),
+                      style: Theme.of(
+                        context,
+                      ).textTheme.bodyMedium, // Roboto Regular
+                      // style: TextStyle(color: Colors.black87),
                     ),
                     GestureDetector(
                       onTap: _onRegister,
                       child: const Text(
                         'Register here',
+
                         style: TextStyle(
                           color: orange,
                           fontWeight: FontWeight.bold,
