@@ -188,18 +188,22 @@ class _LoginScreenState extends State<LoginScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _onLoginPressed,
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 216, 121, 32),
-                      foregroundColor: Colors.white,
-                      shape: const StadiumBorder(),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                    ),
+                    // style: ElevatedButton.styleFrom(
+                    //   backgroundColor: const Color.fromARGB(255, 216, 121, 32),
+                    //   foregroundColor: Colors.white,
+                    //   shape: const StadiumBorder(),
+                    //   padding: const EdgeInsets.symmetric(vertical: 16),
+                    // ),
                     child: Text(
                       'Log In',
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.w600,
-                      ),
+                      // style: TextStyle(
+                      //   fontSize: 18,
+                      //   fontWeight: FontWeight.w600,
+                      // ),
+                      style:
+                          Theme.of(context).elevatedButtonTheme.style?.textStyle
+                              ?.resolve(const {}) ??
+                          const TextStyle(), // uses theme style
                     ),
                   ),
                 ),
