@@ -361,7 +361,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   width: double.infinity,
                   child: ElevatedButton(
                     onPressed: _onRegisterPressed,
-                    child: Text('Register Account'),
+                    child: Text(
+                      'Register Account',
+                      style:
+                          Theme.of(context).elevatedButtonTheme.style?.textStyle
+                              ?.resolve(const {}) ??
+                          const TextStyle(),
+                    ),
                   ),
                 ),
 
