@@ -135,21 +135,21 @@ class _LoginScreenState extends State<LoginScreen> {
                         controller: _passwordController,
                         obscureText: true,
                         decoration: InputDecoration(
-                          filled: true,
-                          fillColor: const Color(0xFFF4F4F4),
+                          // filled: true,
+                          // fillColor: const Color(0xFFF4F4F4),
                           hintText: 'Enter your password',
-                          hintStyle: const TextStyle(
-                            color: orange,
-                            fontSize: 16,
-                          ),
-                          contentPadding: const EdgeInsets.symmetric(
-                            horizontal: 20,
-                            vertical: 16,
-                          ),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            borderSide: BorderSide.none,
-                          ),
+                          // hintStyle: const TextStyle(
+                          //   color: orange,
+                          //   fontSize: 16,
+                          // ),
+                          // contentPadding: const EdgeInsets.symmetric(
+                          //   horizontal: 20,
+                          //   vertical: 16,
+                          // ),
+                          // border: OutlineInputBorder(
+                          //   borderRadius: BorderRadius.circular(8),
+                          //   borderSide: BorderSide.none,
+                          // ),
                         ),
                         validator: (value) {
                           if (value == null || value.isEmpty) {
