@@ -105,48 +105,54 @@ class _SplashScreenState extends State<SplashScreen> {
           final double minSide = maxHeight < maxWidth ? maxHeight : maxWidth;
 
           // Scale text
-          double normalFontSize = minSide * 0.04;
-          if (normalFontSize > 24) normalFontSize = 24;
 
           double boldFontSize = minSide * 0.06;
-          if (boldFontSize > 32) boldFontSize = 32;
+          if (boldFontSize > 36) boldFontSize = 36;
 
           // Image height: 30-40% of screen height
-          double imageHeight = maxHeight * 0.3;
-          if (imageHeight > 200) imageHeight = 200;
+          double imageHeight = maxHeight * 0.2;
+          if (imageHeight > 140) imageHeight = 140;
 
           return Center(
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  "Welcome To",
-                  style: TextStyle(
-                    fontSize: normalFontSize,
-                    fontWeight: FontWeight.normal,
-                  ),
-                ),
-                SizedBox(height: minSide * 0.02),
-                Text(
-                  "NovaCash",
-                  style: TextStyle(
-                    fontSize: boldFontSize,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-                SizedBox(height: minSide * 0.04),
+                // Text(
+                //   "Welcome To",
+                //   style: TextStyle(
+                //     fontSize: normalFontSize,
+                //     fontWeight: FontWeight.normal,
+                //   ),
+                // ),
+                // SizedBox(height: minSide * 0.02),
+                // Text(
+                //   "NovaCash",
+                //   style: TextStyle(
+                //     fontSize: boldFontSize,
+                //     fontWeight: FontWeight.bold,
+                //   ),
+                // ),
+                // SizedBox(height: minSide * 0.04),
                 SvgPicture.asset(
                   "assets/images/logonovacash.svg",
                   height: imageHeight,
                 ),
-                SizedBox(height: minSide * 0.05),
+                SizedBox(height: minSide * 0.06),
                 Text(
-                  "Splash Screen",
+                  "NovaCash",
                   style: TextStyle(
+                    fontFamily: 'Great Vibes',
                     fontSize: boldFontSize,
                     fontWeight: FontWeight.bold,
                   ),
                 ),
+                // Text(
+                //   "Splash Screen",
+                //   style: TextStyle(
+                //     fontSize: boldFontSize,
+                //     fontWeight: FontWeight.bold,
+                //   ),
+                // ),
               ],
             ),
           );
