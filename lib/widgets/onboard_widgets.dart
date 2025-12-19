@@ -126,16 +126,18 @@ class OnboardContent extends StatelessWidget {
             Text(
               title,
               textAlign: TextAlign.center,
-              style: TextStyle(
-                fontSize: titleFontSize,
-                fontWeight: FontWeight.bold,
-              ),
+              style: Theme.of(
+                context,
+              ).textTheme.headlineLarge?.copyWith(fontSize: titleFontSize),
             ),
             const SizedBox(height: 16),
             Text(
               description,
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: descriptionFontSize),
+              // style: TextStyle(fontSize: descriptionFontSize),
+              style: Theme.of(
+                context,
+              ).textTheme.bodyLarge?.copyWith(fontSize: titleFontSize),
             ),
             const Spacer(flex: 1),
           ],
