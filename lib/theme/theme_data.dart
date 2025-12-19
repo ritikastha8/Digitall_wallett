@@ -59,6 +59,10 @@ ThemeData getApplicationTheme() {
         fontSize: 16,
         // fontWeight: FontWeight.w400,
       ),
+      bodyLarge: TextStyle(
+        fontFamily: 'Roboto Regular', // body text
+        fontSize: 12,
+      ),
       bodySmall: TextStyle(
         fontFamily: 'Roboto Regular',
         color: Color(0xFFD87920),
