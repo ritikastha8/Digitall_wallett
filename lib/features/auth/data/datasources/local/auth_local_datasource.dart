@@ -1,5 +1,5 @@
 import 'package:digital_wallett_system/core/services/hive/hive_service.dart';
-import 'package:digital_wallett_system/features/auth/data/datasources/auth_model.dart';
+import 'package:digital_wallett_system/features/auth/data/datasources/auth_datasource.dart';
 import 'package:digital_wallett_system/features/auth/data/models/auth_hive_model.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
