@@ -92,10 +92,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   child: SvgPicture.asset(
                     'assets/images/logonovacash.svg',
                     width: 180,
-                    height: 100,
+                    height: 128,
                   ),
                 ),
-                const SizedBox(height: 32),
+                const SizedBox(height: 60),
 
                 // Title
                 Text(
