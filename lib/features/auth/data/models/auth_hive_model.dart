@@ -12,19 +12,19 @@ class AuthHiveModel {
   @HiveField(1)
   final String fullName;
   @HiveField(2)
-  final String? mobileNumber;
+  final String mobileNumber;
+  // @HiveField(3)
+  // final String username;
   @HiveField(3)
-  final String username;
-  @HiveField(4)
   final String? password;
-  @HiveField(5)
+  @HiveField(4)
   final String? profilePicture;
 
   AuthHiveModel({
     String? authId,
     required this.fullName,
-    this.mobileNumber,
-    required this.username,
+    required this.mobileNumber,
+    // required this.username,
     this.password,
     this.profilePicture,
   }) : authId = authId ?? Uuid().v4();
@@ -35,7 +35,7 @@ class AuthHiveModel {
       authId: entity.authId,
       fullName: entity.fullName,
       mobileNumber: entity.mobileNumber,
-      username: entity.username,
+      // username: entity.username,
       password: entity.password,
       profilePicture: entity.profilePicture,
     );
@@ -46,7 +46,7 @@ class AuthHiveModel {
       authId: authId,
       fullName: fullName,
       mobileNumber: mobileNumber,
-      username: username,
+      // username: username,
       password: password,
       profilePicture: profilePicture,
     );
