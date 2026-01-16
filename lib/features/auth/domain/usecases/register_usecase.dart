@@ -1,7 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:digital_wallett_system/core/errors/failures.dart';
 import 'package:digital_wallett_system/core/usecases/app_usecase.dart';
-import 'package:digital_wallett_system/features/auth/data/repositories/auth_repository_impl.dart';
+import 'package:digital_wallett_system/features/auth/data/repositories/auth_repository.dart';
 import 'package:digital_wallett_system/features/auth/domain/entities/auth_entity.dart';
 import 'package:digital_wallett_system/features/auth/domain/repositories/auth_repository.dart';
 import 'package:equatable/equatable.dart';
@@ -11,19 +11,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class RegisterUsecaseParams extends Equatable {
   final String fullName;
-  final String? mobileNumber;
-  final String username;
+  final String mobileNumber;
+  // final String username;
   final String password;
 
   const RegisterUsecaseParams({
     required this.fullName,
-    this.mobileNumber,
-    required this.username,
+    required this.mobileNumber,
+    // required this.username,
     required this.password,
   });
 
   @override
-  List<Object?> get props => [fullName, mobileNumber, username, password];
+  List<Object?> get props => [fullName, mobileNumber, password];
 }
 
 /// --------------------
@@ -49,7 +49,7 @@ class RegisterUsecase
     final entity = AuthEntity(
       fullName: params.fullName,
       mobileNumber: params.mobileNumber,
-      username: params.username,
+      // username: params.username,
       password: params.password,
     );
 
