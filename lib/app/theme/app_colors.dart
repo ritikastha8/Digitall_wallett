@@ -5,8 +5,8 @@ class AppColors {
 
   // ----------------- Primary Colors -----------------
   static const Color primary = Color(0xFFD07522);
-  static const Color primaryDark = Color(0xFF357ABD);
-  static const Color primaryLight = Color(0xFF78A9E0);
+  static const Color primaryDark = Color.fromARGB(255, 189, 123, 53);
+  static const Color primaryLight = Color.fromARGB(255, 224, 175, 120);
 
   // ----------------- Secondary Colors -----------------
   static const Color secondary = Color(0xFFFFA726);
@@ -83,4 +83,10 @@ class AppColors {
     end: Alignment.bottomRight,
     colors: [Color(0xFFFFA726), Color(0xFFFFC168)],
   );
+  static const LinearGradient thiirdGradient = LinearGradient(
+    begin: Alignment.topLeft,
+    end: Alignment.bottomRight,
+    colors: [Color(0xFFD07522), Color.fromARGB(255, 234, 161, 78)],
+  );
 }
+
