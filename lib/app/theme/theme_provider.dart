@@ -6,9 +6,14 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 final themeModeProvider = NotifierProvider<ThemeModeNotifier, ThemeMode>(
   ThemeModeNotifier.new,
 );
+final lightSensorThemeEnabledProvider =
+    NotifierProvider<LightSensorThemeNotifier, bool>(
+      LightSensorThemeNotifier.new,
+    );
 
 class ThemeModeNotifier extends Notifier<ThemeMode> {
   static const String _themeKey = 'theme_mode';
+  static const String _themeManuallySetKey = 'theme_mode_manually_set';
 
   @override
   ThemeMode build() {
@@ -18,12 +23,13 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
     if (themeValue != null) {
       return _themeModeFromString(themeValue);
     }
-    return ThemeMode.system;
+    return ThemeMode.light;
   }
 
   Future<void> setThemeMode(ThemeMode mode) async {
     final prefs = ref.read(sharedPreferencesProvider);
     state = mode;
+    await prefs.setBool(_themeManuallySetKey, true);
     await prefs.setString(_themeKey, _themeModeToString(mode));
   }
 
@@ -33,6 +39,15 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
     } else {
       await setThemeMode(ThemeMode.dark);
     }
+  }
+
+  Future<void> setThemeModeFromLightSensor(ThemeMode mode) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    if (state != mode) {
+      state = mode;
+    }
+    await prefs.setBool(_themeManuallySetKey, false);
+    await prefs.setString(_themeKey, _themeModeToString(mode));
   }
 
   bool get isDarkMode => state == ThemeMode.dark;
@@ -57,5 +72,22 @@ class ThemeModeNotifier extends Notifier<ThemeMode> {
       case ThemeMode.system:
         return 'system';
     }
+  }
+}
+
+class LightSensorThemeNotifier extends Notifier<bool> {
+  static const String _lightSensorThemeEnabledKey =
+      'light_sensor_theme_enabled';
+
+  @override
+  bool build() {
+    final prefs = ref.read(sharedPreferencesProvider);
+    return prefs.getBool(_lightSensorThemeEnabledKey) ?? false;
+  }
+
+  Future<void> setEnabled(bool value) async {
+    final prefs = ref.read(sharedPreferencesProvider);
+    state = value;
+    await prefs.setBool(_lightSensorThemeEnabledKey, value);
   }
 }
