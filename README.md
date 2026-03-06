@@ -4,7 +4,7 @@ NovaCash is a mobile digital wallet application developed using Flutter. The app
 
 ## Overview
 
-NovaCash aims to provide a simplified digital payment experience by focusing on essential wallet features instead of complex financial services. The application demonstrates important mobile development concepts such as clean architecture, state management, sensor integration, and cloud-based data handling.
+NovaCash aims to provide a simplified digital payment experience by focusing on essential wallet features instead of complex financial services. The application shows important mobile development concepts such as clean architecture, state management, sensor integration, and cloud-based data handling.
 
 ## Technology Stack
 
