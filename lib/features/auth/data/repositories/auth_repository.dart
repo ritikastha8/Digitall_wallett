@@ -1,6 +1,7 @@
 import 'package:dartz/dartz.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:digital_wallett_system/core/api/api_client.dart';
 import 'package:digital_wallett_system/core/errors/failures.dart';
 import 'package:digital_wallett_system/core/services/connectivity/network_info.dart';
 import 'package:digital_wallett_system/features/auth/data/datasources/auth_datasource.dart';
@@ -16,11 +17,13 @@ final authRepositoryProvider = Provider<IAuthRepository>((ref) {
   final authLocalDatasource = ref.read(authLocalDatasourceProvider);
   final authRemoteDatasource = ref.read(authRemoteDatasourceProvider);
   final networkInfo = ref.read(networkInfoProvider);
+  final apiClient = ref.read(apiClientProvider);
 
   return AuthRepository(
     authLocalDatasource: authLocalDatasource,
     authRemoteDatasource: authRemoteDatasource,
     networkInfo: networkInfo,
+    apiClient: apiClient,
   );
 });
 
@@ -29,14 +32,33 @@ class AuthRepository implements IAuthRepository {
   final IAuthLocalDatasource _authLocalDatasource;
   final IAuthRemoteDataSource _authRemoteDatasource;
   final NetworkInfo _networkInfo;
+  final ApiClient _apiClient;
 
   AuthRepository({
     required IAuthLocalDatasource authLocalDatasource,
     required IAuthRemoteDataSource authRemoteDatasource,
     required NetworkInfo networkInfo,
+    required ApiClient apiClient,
   }) : _authLocalDatasource = authLocalDatasource,
        _authRemoteDatasource = authRemoteDatasource,
-       _networkInfo = networkInfo;
+       _networkInfo = networkInfo,
+       _apiClient = apiClient;
+
+  Future<Either<Failure, AuthEntity>> _tryLocalLogin(
+    String mobileNumber,
+    String password, {
+    String? failureMessage,
+  }) async {
+    final model = await _authLocalDatasource.login(mobileNumber, password);
+    if (model != null) {
+      return Right(model.toEntity());
+    }
+    return Left(
+      LocalDatabaseFailure(
+        message: failureMessage ?? "Invalid mobile number or password",
+      ),
+    );
+  }
 
   @override
   Future<Either<Failure, bool>> register(AuthEntity user) async {
@@ -67,9 +89,12 @@ class AuthRepository implements IAuthRepository {
         }
 
         final authModel = AuthHiveModel(
+          authId: user.authId,
           fullName: user.fullName,
           mobileNumber: user.mobileNumber,
+          email: user.email,
           password: user.password,
+          confirmPassword: user.confirmPassword,
           profilePicture: user.profilePicture,
         );
         await _authLocalDatasource.register(authModel);
@@ -92,13 +117,40 @@ class AuthRepository implements IAuthRepository {
           password,
         );
         if (apiModel != null) {
+          // Keep password in local cache for offline login.
+          final authHiveModel = AuthHiveModel(
+            authId: apiModel.id,
+            fullName: apiModel.fullName,
+            mobileNumber: apiModel.mobileNumber,
+            email: apiModel.email,
+            password: password,
+            confirmPassword: password,
+            profilePicture: apiModel.profilePicture,
+          );
+          await _authLocalDatasource.register(authHiveModel);
           return Right(apiModel.toEntity());
         }
-        return const Left(ApiFailure(message: "Invalid credentials"));
+        return _tryLocalLogin(
+          mobileNumber,
+          password,
+          failureMessage: "Invalid credentials",
+        );
       } on DioException catch (e) {
+        if (e.type == DioExceptionType.connectionError ||
+            e.type == DioExceptionType.connectionTimeout ||
+            e.type == DioExceptionType.sendTimeout ||
+            e.type == DioExceptionType.receiveTimeout) {
+          return _tryLocalLogin(
+            mobileNumber,
+            password,
+            failureMessage: "No internet connection for login",
+          );
+        }
         return Left(
           ApiFailure(
-            message: e.response?.data['message'] ?? 'Login failed',
+            message: e.response?.data is Map
+                ? (e.response?.data['message'] ?? 'Login failed')
+                : (e.message ?? 'Login failed'),
             statusCode: e.response?.statusCode,
           ),
         );
@@ -107,13 +159,7 @@ class AuthRepository implements IAuthRepository {
       }
     } else {
       try {
-        final model = await _authLocalDatasource.login(mobileNumber, password);
-        if (model != null) {
-          return Right(model.toEntity());
-        }
-        return const Left(
-          LocalDatabaseFailure(message: "Invalid mobile number or password"),
-        );
+        return _tryLocalLogin(mobileNumber, password);
       } catch (e) {
         return Left(LocalDatabaseFailure(message: e.toString()));
       }
@@ -136,13 +182,52 @@ class AuthRepository implements IAuthRepository {
   @override
   Future<Either<Failure, bool>> logout() async {
     try {
-      final result = await _authLocalDatasource.logout();
-      if (result) {
-        return const Right(true);
+      await _apiClient.clearToken();
+      await _authLocalDatasource.logout();
+      return const Right(true);
+    } catch (e) {
+      return Left(
+        LocalDatabaseFailure(message: "Logout failed:${e.toString()}"),
+      );
+    }
+  }
+
+  @override
+  Future<Either<Failure, AuthEntity>> getUserByMobileNumber(
+    String mobileNumber,
+  ) async {
+    try {
+      final model = await _authLocalDatasource.getUserByMobileNumber(
+        mobileNumber,
+      );
+      if (model != null) {
+        return Right(model.toEntity());
       }
-      return const Left(LocalDatabaseFailure(message: "Failed to logout"));
+      return const Left(LocalDatabaseFailure(message: "Locally No user found"));
     } catch (e) {
       return Left(LocalDatabaseFailure(message: e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<Failure, void>> setPin(String pin, String confirmPin) async {
+    if (!await _networkInfo.isConnected) {
+      return const Left(
+        ApiFailure(message: 'No internet connection'),
+      );
+    }
+    try {
+      await _authRemoteDatasource.setPin(pin, confirmPin);
+      return const Right(null);
+    } on DioException catch (e) {
+      return Left(
+        ApiFailure(
+          message: e.response?.data['message'] ?? 'Failed to set PIN',
+          statusCode: e.response?.statusCode,
+        ),
+      );
+    } catch (e) {
+      return Left(ApiFailure(message: e.toString()));
     }
   }
 }

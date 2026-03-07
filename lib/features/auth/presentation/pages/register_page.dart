@@ -1,8 +1,10 @@
 import 'package:digital_wallett_system/app/theme/app_colors.dart';
 import 'package:digital_wallett_system/app/theme/theme_extensions.dart';
 import 'package:digital_wallett_system/core/utils/snackbar_utils.dart';
+import 'package:digital_wallett_system/features/auth/domain/entities/auth_entity.dart';
 import 'package:digital_wallett_system/features/auth/presentation/state/auth_state.dart';
 import 'package:digital_wallett_system/features/auth/presentation/view_model/auth_view_model.dart';
+import 'package:digital_wallett_system/features/terms/presentation/pages/terms_page.dart';
 import 'package:digital_wallett_system/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -21,8 +23,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
   final _nameController = TextEditingController();
   final _mobileController = TextEditingController();
+  final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  final _confirmController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
   bool _obscurePassword = true;
   bool _obscureConfirm = true;
@@ -32,8 +35,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
   void dispose() {
     _nameController.dispose();
     _mobileController.dispose();
+    _emailController.dispose();
     _passwordController.dispose();
-    _confirmController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
   }
 
@@ -47,15 +51,15 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
     }
 
     if (!_formKey.currentState!.validate()) return;
-
-    await ref
-        .read(authViewModelProvider.notifier)
-        .register(
-          fullName: _nameController.text.trim(),
-          mobileNumber: _mobileController.text.trim(),
-          username: _mobileController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
+    final user = AuthEntity(
+      fullName: _nameController.text.trim(),
+      mobileNumber: _mobileController.text,
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+      confirmPassword: _confirmPasswordController.text,
+      // role: 'user',
+    );
+    await ref.read(authViewModelProvider.notifier).register(user);
   }
 
   void _navigateToLogin() {
@@ -170,6 +174,27 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
                 const SizedBox(height: 16),
 
+                // Email Field
+                _buildField(
+                  controller: _emailController,
+                  hint: 'Email Address',
+                  prefixIcon: Icons.email_outlined,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your email';
+                    }
+                    if (!RegExp(
+                      r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$',
+                    ).hasMatch(value)) {
+                      return 'Please enter a valid email';
+                    }
+                    return null;
+                  },
+                ),
+
+                const SizedBox(height: 16),
+
                 /// Password
                 _buildField(
                   controller: _passwordController,
@@ -203,7 +228,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
 
                 /// Confirm Password
                 _buildField(
-                  controller: _confirmController,
+                  controller: _confirmPasswordController,
                   hint: 'Confirm Password',
                   prefixIcon: Icons.lock_outline_rounded,
                   obscure: _obscureConfirm,
@@ -245,27 +270,35 @@ class _RegisterPageState extends ConsumerState<RegisterPage> {
                       },
                     ),
                     Expanded(
-                      child: Text.rich(
-                        TextSpan(
-                          text: 'I agree to the ',
-                          style: TextStyle(color: context.textSecondary),
-                          children: [
-                            TextSpan(
-                              text: 'Terms & Conditions',
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
+                      child: GestureDetector(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(builder: (_) => const TermsPage()),
+                          );
+                        },
+                        child: Text.rich(
+                          TextSpan(
+                            text: 'I agree to the ',
+                            style: TextStyle(color: context.textSecondary),
+                            children: [
+                              TextSpan(
+                                text: 'Terms & Conditions',
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                            const TextSpan(text: ' and '),
-                            TextSpan(
-                              text: 'Privacy Policy',
-                              style: TextStyle(
-                                color: AppColors.primary,
-                                fontWeight: FontWeight.w600,
+                              const TextSpan(text: ' and '),
+                              TextSpan(
+                                text: 'Privacy Policy',
+                                style: TextStyle(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w600,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ),

@@ -7,14 +7,14 @@ import 'package:digital_wallett_system/features/dashboard/data/repositories/dash
 import 'package:digital_wallett_system/features/dashboard/domain/repositories/dashboard_repository.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-final uploadPhotoUsecaseProvider = Provider<uploadPhotoUsecase>((ref) {
+final uploadPhotoUsecaseProvider = Provider<UploadPhotoUsecase>((ref) {
   final repository = ref.read(dashboardRepositoryProvider);
-  return uploadPhotoUsecase(repository: repository);
+  return UploadPhotoUsecase(repository: repository);
 });
 
-class uploadPhotoUsecase implements UsecaseWithParams<String, File> {
+class UploadPhotoUsecase implements UsecaseWithParams<String, File> {
   final DDashboardRepository _repository;
-  uploadPhotoUsecase({required DDashboardRepository repository})
+  UploadPhotoUsecase({required DDashboardRepository repository})
     : _repository = repository;
 
   @override

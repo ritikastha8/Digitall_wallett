@@ -3,7 +3,7 @@ import 'dart:io';
 import 'package:dartz/dartz.dart';
 import 'package:digital_wallett_system/core/errors/failures.dart';
 import 'package:digital_wallett_system/core/services/connectivity/network_info.dart';
-import 'package:digital_wallett_system/features/dashboard/data/datasources/dashboard_datasource..dart';
+import 'package:digital_wallett_system/features/dashboard/data/datasources/dashboard_datasource.dart';
 import 'package:digital_wallett_system/features/dashboard/data/datasources/local/dashboard_local_datasource.dart';
 import 'package:digital_wallett_system/features/dashboard/data/datasources/remote/dashboard_remote_datasource.dart';
 // import 'package:digital_wallett_system/features/dashboard/domain/entities/dashboard_entity.dart';
@@ -38,8 +38,8 @@ class DashboardRepository implements DDashboardRepository {
     // remote ma matrai insert huna paryo
     if (await _networkInfo.isConnected) {
       try {
-        final fileName = await _dashboardRemoteDataSource.uploadImage(image);
-        return Right(fileName);
+        final model = await _dashboardRemoteDataSource.uploadImage(image);
+        return Right(model.media ?? '');
       } catch (e) {
         return Left(ApiFailure(message: e.toString()));
       }

@@ -59,6 +59,7 @@ class ApiClient {
           requestHeader: true,
           requestBody: true,
           responseBody: true,
+          responseHeader: false,
           compact: true,
           error: true,
         ),
@@ -77,27 +78,63 @@ class ApiClient {
   }
 
   // POST request
-  Future<Response> post(String path, {dynamic data}) async {
-    return _dio.post(path, data: data);
+  Future<Response> post(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    return _dio.post(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 
   // PUT request
-  Future<Response> put(String path, {dynamic data}) async {
-    return _dio.put(path, data: data);
+  Future<Response> put(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    return _dio.put(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 
   // DELETE request
-  Future<Response> delete(String path, {dynamic data}) async {
-    return _dio.delete(path, data: data);
+  Future<Response> delete(
+    String path, {
+    dynamic data,
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
+    return _dio.delete(
+      path,
+      data: data,
+      queryParameters: queryParameters,
+      options: options,
+    );
   }
 
-  // Upload file
+  // Multipart request for file uploads
   Future<Response> uploadFile(
     String path, {
     required FormData formData,
+    Options? options,
     ProgressCallback? onSendProgress,
   }) async {
-    return _dio.post(path, data: formData, onSendProgress: onSendProgress);
+    return _dio.put(
+      path,
+      data: formData,
+      options: options,
+      onSendProgress: onSendProgress,
+    );
   }
 
   // Save JWT token (after login)
@@ -129,9 +166,9 @@ class _AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     // Skip auth for public endpoints
-    final publicEndpoints = [ApiEndpoints.register, ApiEndpoints.login];
+    final publicEndpoints = [ApiEndpoints.register, ApiEndpoints.login, ApiEndpoints.requestPasswordReset];
 
-    final isPublic = publicEndpoints.any((e) => options.path.startsWith(e));
+    final isPublic = publicEndpoints.any((e) => options.path.startsWith(e)) || options.path.contains('reset-password');
 
     if (!isPublic) {
       final token = await _storage.read(key: _tokenKey);

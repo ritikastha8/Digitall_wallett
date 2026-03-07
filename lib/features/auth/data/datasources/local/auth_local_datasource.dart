@@ -1,77 +1,122 @@
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:digital_wallett_system/core/services/hive/hive_service.dart';
+import 'package:digital_wallett_system/core/services/storage/user_session_service.dart';
 import 'package:digital_wallett_system/features/auth/data/datasources/auth_datasource.dart';
 import 'package:digital_wallett_system/features/auth/data/models/auth_hive_model.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 
-// Provider
+// Provider for AuthLocalDatasource
 final authLocalDatasourceProvider = Provider<AuthLocalDatasource>((ref) {
-  final hiveService = ref.watch(hiveServiceProvider);
-  return AuthLocalDatasource(hiveService: hiveService);
+  final hiveService = ref.read(hiveServiceProvider);
+  final userSessionService = ref.read(userSessionServiceProvider);
+  return AuthLocalDatasource(
+    hiveService: hiveService,
+    userSessionService: userSessionService,
+  );
 });
 
-class AuthLocalDatasource implements IAuthDatasource {
+class AuthLocalDatasource implements IAuthLocalDatasource {
   final HiveService _hiveService;
+  final UserSessionService _userSessionService;
 
-  AuthLocalDatasource({required HiveService hiveService})
-    : _hiveService = hiveService;
+  AuthLocalDatasource({
+    required HiveService hiveService,
+    required UserSessionService userSessionService,
+  }) : _hiveService = hiveService,
+       _userSessionService = userSessionService;
 
+  // ===================== Register =====================
   @override
-  Future<AuthHiveModel?> getCurrentUser(String authId) {
-    try {
-      final user = _hiveService.getCurrentUser(authId);
-      return Future.value(user);
-    } catch (e) {
-      return Future.value(null);
-    }
+  Future<AuthHiveModel> register(AuthHiveModel user) async {
+    return await _hiveService.registerUser(user);
   }
 
-  @override
-  Future<bool> isUsernameExists(String username) {
-    try {
-      final exists = _hiveService.isUsernameExists(username);
-      return Future.value(exists);
-    } catch (e) {
-      return Future.value(false);
-    }
-  }
-
-  @override
-  Future<bool> isMobileNumberExists(String mobileNumber) {
-    try {
-      final exists = _hiveService.isMobileNumberExists(mobileNumber);
-      return Future.value(exists);
-    } catch (e) {
-      return Future.value(false);
-    }
-  }
-
+  // ===================== Login =====================
   @override
   Future<AuthHiveModel?> login(String mobileNumber, String password) async {
     try {
       final user = _hiveService.loginUser(mobileNumber, password);
-      return Future.value(user);
+      if (user != null && user.authId != null) {
+        // Save session
+        await _userSessionService.saveUserSession(
+          userId: user.authId!,
+          fullName: user.fullName,
+          mobileNumber: user.mobileNumber,
+          email: user.email,
+          token: 'offlinetoken',
+          profilePicture: user.profilePicture,
+          // Add more fields if needed
+        );
+      }
+      return user;
     } catch (e) {
-      return Future.value(null);
+      return null;
     }
   }
 
+  // ===================== Current User =====================
+  @override
+  Future<AuthHiveModel?> getCurrentUser() async {
+    try {
+      if (!_userSessionService.isLoggedIn()) return null;
+
+      final userId = _userSessionService.getCurrentUserId();
+      if (userId == null) return null;
+
+      return _hiveService.getUserById(userId);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // ===================== Logout =====================
   @override
   Future<bool> logout() async {
     try {
-      await _hiveService.logoutUser();
-      return Future.value(true);
+      await _userSessionService.clearSession();
+      return true;
     } catch (e) {
-      return Future.value(false);
+      return false;
+    }
+  }
+
+  // ===================== Get User =====================
+  @override
+  Future<AuthHiveModel?> getUserById(String authId) async {
+    try {
+      return _hiveService.getUserById(authId);
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // ===================== Update/Delete =====================
+  @override
+  Future<bool> updateUser(AuthHiveModel user) async {
+    try {
+      return await _hiveService.updateUser(user);
+    } catch (e) {
+      return false;
     }
   }
 
   @override
-  Future<bool> register(AuthHiveModel model) async {
+  Future<bool> deleteUser(String authId) async {
     try {
-      await _hiveService.registerUser(model);
-      return Future.value(true);
+      await _hiveService.deleteUser(authId);
+      return true;
     } catch (e) {
-      return Future.value(false);
+      return false;
+    }
+  }
+
+  // ===================== Check uniqueness =====================
+
+  @override
+  Future<AuthHiveModel?> getUserByMobileNumber(String mobileNumber) async {
+    try {
+      return _hiveService.getUserByMobile(mobileNumber);
+    } catch (e) {
+      return null;
     }
   }
 }

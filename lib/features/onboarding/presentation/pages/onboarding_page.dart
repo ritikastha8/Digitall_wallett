@@ -1,17 +1,19 @@
+import 'package:digital_wallett_system/core/services/storage/user_session_service.dart';
+import 'package:digital_wallett_system/features/auth/presentation/pages/login_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import '../../domain/entities/onboarding_item.dart';
 import '../widgets/dot_indicator.dart';
-import '../../../auth/presentation/pages/login_page.dart';
 
-class OnboardingPage extends StatefulWidget {
+class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
 
   @override
-  State<OnboardingPage> createState() => _OnboardingPageState();
+  ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _OnboardingPageState extends State<OnboardingPage> {
+class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   late PageController _pageController;
   int _pageIndex = 0;
 
@@ -50,6 +52,7 @@ class _OnboardingPageState extends State<OnboardingPage> {
 
   void _nextPage() {
     if (_pageIndex == _items.length - 1) {
+      ref.read(userSessionServiceProvider).setHasSeenOnboarding(true);
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const LoginPage()),

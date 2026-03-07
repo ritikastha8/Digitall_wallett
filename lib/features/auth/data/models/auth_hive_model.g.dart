@@ -20,27 +20,30 @@ class AuthHiveModelAdapter extends TypeAdapter<AuthHiveModel> {
       authId: fields[0] as String?,
       fullName: fields[1] as String,
       mobileNumber: fields[2] as String,
-      // username: fields[3] as String,
-      password: fields[3] as String?,
-      profilePicture: fields[4] as String?,
+      email: fields[3] as String,
+      password: fields[4] as String?,
+      confirmPassword: fields[6] as String?,
+      profilePicture: fields[7] as String?,
     );
   }
 
   @override
   void write(BinaryWriter writer, AuthHiveModel obj) {
     writer
-      ..writeByte(6)
+      ..writeByte(7)
       ..writeByte(0)
       ..write(obj.authId)
       ..writeByte(1)
       ..write(obj.fullName)
       ..writeByte(2)
       ..write(obj.mobileNumber)
-      // ..writeByte(3)
-      // ..write(obj.username)
       ..writeByte(3)
-      ..write(obj.password)
+      ..write(obj.email)
       ..writeByte(4)
+      ..write(obj.password)
+      ..writeByte(6)
+      ..write(obj.confirmPassword)
+      ..writeByte(7)
       ..write(obj.profilePicture);
   }
 

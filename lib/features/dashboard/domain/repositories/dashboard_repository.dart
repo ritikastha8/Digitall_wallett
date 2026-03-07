@@ -2,7 +2,6 @@ import 'dart:io';
 
 import 'package:dartz/dartz.dart';
 import 'package:digital_wallett_system/core/errors/failures.dart';
-import 'package:digital_wallett_system/features/dashboard/domain/entities/dashboard_entity.dart';
 
 abstract interface class DDashboardRepository {
   // Future<Either<Failure, List<DashboardEntity>>> getAllItems();

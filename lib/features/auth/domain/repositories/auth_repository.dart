@@ -9,8 +9,12 @@ abstract interface class IAuthRepository {
     String mobileNumber,
     String password,
   );
-
-  Future<Either<Failure, AuthEntity>> getCurrentUser(String authId);
+  Future<Either<Failure, AuthEntity>> getUserByMobileNumber(
+    String mobileNumber,
+  );
+  Future<Either<Failure, AuthEntity>> getCurrentUser();
 
   Future<Either<Failure, bool>> logout();
+
+  Future<Either<Failure, void>> setPin(String pin, String confirmPin);
 }

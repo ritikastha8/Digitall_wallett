@@ -8,6 +8,7 @@ void main() {
       final model = AuthApiModel(
         fullName: 'Ritika',
         mobileNumber: '9800000000',
+        email: "test12@gmail.com",
         password: '1234',
         profilePicture: 'img.png',
       );
@@ -40,6 +41,7 @@ void main() {
       final model = AuthApiModel(
         id: '1',
         fullName: 'Ritika',
+        email: "test@gmail.com",
         mobileNumber: '9800000000',
         profilePicture: 'img.png',
       );
@@ -57,6 +59,7 @@ void main() {
         authId: '1',
         fullName: 'Ritika',
         mobileNumber: '9800000000',
+        email: 'ritika@test.com',
         password: '1234',
         profilePicture: 'img.png',
       );
@@ -71,8 +74,16 @@ void main() {
 
     test('toEntityList converts model list to entity list', () {
       final models = [
-        AuthApiModel(fullName: 'User1', mobileNumber: '111'),
-        AuthApiModel(fullName: 'User2', mobileNumber: '222'),
+        AuthApiModel(
+          fullName: 'User1',
+          mobileNumber: '111',
+          email: 'user1@test.com',
+        ),
+        AuthApiModel(
+          fullName: 'User2',
+          mobileNumber: '222',
+          email: 'user2@test.com',
+        ),
       ];
 
       final entities = AuthApiModel.toEntityList(models);

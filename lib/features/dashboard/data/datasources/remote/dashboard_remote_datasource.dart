@@ -1,27 +1,10 @@
-// import 'dart:io';
-
-// import 'package:digital_wallett_system/core/api/api_client.dart';
-// import 'package:digital_wallett_system/core/services/storage/token_service.dart';
-// import 'package:dio/dio.dart';
-// import 'package:flutter_riverpod/flutter_riverpod.dart';
-
-// final dashboardRemoteDatasourceProvider = Provider<Ddasboard>((
-//   ref,
-// ) {
-//   return DashboardRemoteDatasource(
-//     apiClient: ref.read(apiClientProvider),
-//     tokenService: ref.read(tokenServiceProvider),
-//   );
-// });
-
-// class DashboardRemoteDatasource implements Ddas{}
-
 import 'dart:io';
 
 import 'package:digital_wallett_system/core/api/api_client.dart';
 import 'package:digital_wallett_system/core/api/api_endpoints.dart';
 import 'package:digital_wallett_system/core/services/storage/token_service.dart';
-import 'package:digital_wallett_system/features/dashboard/data/datasources/dashboard_datasource..dart';
+import 'package:digital_wallett_system/features/dashboard/data/datasources/dashboard_datasource.dart';
+import 'package:digital_wallett_system/features/dashboard/data/models/dashboard_api_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -45,7 +28,7 @@ class DashboardRemoteDatasource implements DDashboardRemoteDataSource {
        _tokenService = tokenService;
 
   @override
-  Future<String> uploadImage(File image) async {
+  Future<DashboardApiModel> uploadImage(File image) async {
     // path => c:asd/asd/a.jpg , asd asd means just a folder name ; then take only the name of the image file
     final fileName = image.path.split('/').last;
     final formData = FormData.fromMap({
@@ -64,7 +47,16 @@ class DashboardRemoteDatasource implements DDashboardRemoteDataSource {
       options: Options(headers: {'Authorization': 'Bearer $token'}),
     );
 
-    var a = response.data['data'];
-    return a;
+    final data = response.data;
+    if (data is Map<String, dynamic>) {
+      final inner = data['data'];
+      if (inner is Map<String, dynamic>) {
+        return DashboardApiModel.fromJson(inner);
+      }
+      if (inner != null) {
+        return DashboardApiModel(media: inner.toString());
+      }
+    }
+    return const DashboardApiModel();
   }
 }

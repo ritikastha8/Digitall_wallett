@@ -8,6 +8,7 @@ void main() {
       final model = AuthHiveModel(
         fullName: 'Ritika',
         mobileNumber: '9800000000',
+        email: "test2@gmail.com",
       );
 
       expect(model.authId, isNotNull);
@@ -18,6 +19,7 @@ void main() {
         authId: '1',
         fullName: 'Ritika',
         mobileNumber: '9800000000',
+        email: "test2@gmail.com",
         password: '1234',
         profilePicture: 'img.png',
       );
@@ -36,6 +38,7 @@ void main() {
         authId: '1',
         fullName: 'Ritika',
         mobileNumber: '9800000000',
+        email: "test22@gmail.com",
         password: '1234',
         profilePicture: 'img.png',
       );
@@ -51,8 +54,16 @@ void main() {
 
     test('toEntityList converts hive model list correctly', () {
       final models = [
-        AuthHiveModel(fullName: 'User1', mobileNumber: '111'),
-        AuthHiveModel(fullName: 'User2', mobileNumber: '222'),
+        AuthHiveModel(
+          fullName: 'User1',
+          mobileNumber: '111',
+          email: "test12@gmail.com",
+        ),
+        AuthHiveModel(
+          fullName: 'User2',
+          mobileNumber: '222',
+          email: "test12@gmail.com",
+        ),
       ];
 
       final entities = AuthHiveModel.toEntityList(models);

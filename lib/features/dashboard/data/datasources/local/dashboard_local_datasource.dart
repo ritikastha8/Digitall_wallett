@@ -1,5 +1,5 @@
 import 'package:digital_wallett_system/core/services/hive/hive_service.dart';
-import 'package:digital_wallett_system/features/dashboard/data/datasources/dashboard_datasource..dart';
+import 'package:digital_wallett_system/features/dashboard/data/datasources/dashboard_datasource.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 final dashboardLocalDatasourceProvider = Provider<DashboardLocalDatasource>((

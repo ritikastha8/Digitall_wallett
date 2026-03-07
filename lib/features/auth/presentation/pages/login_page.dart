@@ -1,14 +1,14 @@
 import 'package:digital_wallett_system/app/routes/app_routes.dart';
 import 'package:digital_wallett_system/app/theme/app_colors.dart';
+import 'package:digital_wallett_system/features/auth/presentation/pages/forgot_password_page.dart';
+import 'package:digital_wallett_system/features/auth/presentation/pages/register_page.dart';
+import 'package:digital_wallett_system/features/auth/presentation/state/auth_state.dart';
+import 'package:digital_wallett_system/features/auth/presentation/view_model/auth_view_model.dart';
 import 'package:digital_wallett_system/features/dashboard/presentation/pages/bottom_pages/bottomnavigation_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-import '../../domain/entities/auth_entity.dart';
-import '../state/auth_state.dart';
-import '../view_model/auth_view_model.dart';
-import '../pages/register_page.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -32,14 +32,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   Future<void> _handleLogin() async {
-    if (!_formKey.currentState!.validate()) return;
-
-    await ref
-        .read(authViewModelProvider.notifier)
-        .login(
-          mobileNumber: _mobileController.text.trim(),
-          password: _passwordController.text.trim(),
-        );
+    if (_formKey.currentState!.validate()) {
+      await ref
+          .read(authViewModelProvider.notifier)
+          .login(
+            mobileNumber: _mobileController.text.trim(),
+            password: _passwordController.text,
+          );
+    }
   }
 
   void _navigateToRegister() {
@@ -47,15 +47,13 @@ class _LoginPageState extends ConsumerState<LoginPage> {
   }
 
   void _handleForgotPassword() {
-    ScaffoldMessenger.of(
-      context,
-    ).showSnackBar(const SnackBar(content: Text('Forgot password ')));
+    Navigator.push(context, MaterialPageRoute(builder: (_) => const ForgotPasswordPage()));
   }
 
   @override
   Widget build(BuildContext context) {
     final authState = ref.watch(authViewModelProvider);
-    final isDarkMode = Theme.of(context).brightness == Brightness.dark;
+    // final isDarkMode = Theme.of(context).brightness == Brightness.dark;
     final textColor =
         Theme.of(context).textTheme.bodyLarge?.color ?? Colors.black;
     final secondaryTextColor =
@@ -129,8 +127,10 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                   ],
 
                   validator: (value) {
-                    if (value == null || value.isEmpty)
+                    if (value == null || value.isEmpty) {
                       return 'Please enter mobile number';
+                    }
+
                     if (value.length < 10) return 'Enter valid mobile number';
                     return null;
                   },
@@ -158,10 +158,14 @@ class _LoginPageState extends ConsumerState<LoginPage> {
                     ),
                   ),
                   validator: (value) {
-                    if (value == null || value.isEmpty)
-                      return 'Please enter your password';
-                    if (value.length < 6)
+                    if (value == null || value.isEmpty) {
+                      return "Please enter your password";
+                    }
+
+                    if (value.length < 6) {
                       return 'Password must be at least 6 characters';
+                    }
+
                     return null;
                   },
                 ),

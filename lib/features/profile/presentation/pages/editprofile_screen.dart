@@ -1,11 +1,11 @@
 import 'dart:io';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:digital_wallett_system/app/routes/app_routes.dart';
 import 'package:digital_wallett_system/app/theme/app_colors.dart';
 import 'package:digital_wallett_system/app/theme/theme_extensions.dart';
-import 'package:digital_wallett_system/core/api/api_client.dart';
 import 'package:digital_wallett_system/core/api/api_endpoints.dart';
 import 'package:digital_wallett_system/core/services/storage/user_session_service.dart';
-import 'package:dio/dio.dart';
+import 'package:digital_wallett_system/features/profile/domain/usecases/update_profile_usecase.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:image_picker/image_picker.dart';
@@ -192,221 +192,42 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isLoading = true);
 
-    final userSession = ref.read(userSessionServiceProvider);
-    try {
-      final apiClient = ref.read(apiClientProvider);
-      String? uploadedProfilePath;
+    final result = await ref.read(updateProfileUsecaseProvider)(
+      UpdateProfileParams(
+        fullName: _nameController.text.trim(),
+        mobileNumber: _mobileNumberController.text.trim(),
+        imagePath: _imageFile?.path,
+      ),
+    );
 
-      // Upload image via dedicated endpoint. This is the path your backend
-      // usually persists as imageUrl.
-      if (_imageFile != null) {
-        final uploadFormData = FormData.fromMap({
-          'profilePhoto': await MultipartFile.fromFile(
-            _imageFile!.path,
-            filename: _imageFile!.path.split('/').last,
-          ),
-        });
-        try {
-          final uploadResponse = await apiClient.uploadFile(
-            ApiEndpoints.profileUploadPhoto,
-            formData: uploadFormData,
-            options: Options(contentType: 'multipart/form-data'),
-          );
-          final uploadData = uploadResponse.data;
-          if (uploadData is Map<String, dynamic>) {
-            final dynamic inner = uploadData['data'];
-            if (inner is String) {
-              uploadedProfilePath = inner;
-            } else if (inner is Map<String, dynamic>) {
-              uploadedProfilePath =
-                  (inner['imageUrl'] ??
-                          inner['profilePhoto'] ??
-                          inner['profilePicture'] ??
-                          inner['path'] ??
-                          inner['image'])
-                      ?.toString();
-            }
-          }
-        } catch (_) {}
-      }
-
-      // Build multipart form exactly like Postman/backend contract.
-      final Map<String, dynamic> data = {
-        "name": _nameController.text.trim(),
-        "fullName": _nameController.text.trim(),
-        "mobileNumber": _mobileNumberController.text.trim(),
-      };
-      if (uploadedProfilePath != null && uploadedProfilePath.isNotEmpty) {
-        data['imageUrl'] = uploadedProfilePath;
-      }
-      Future<FormData> buildFormData() async {
-        final map = Map<String, dynamic>.from(data);
-        if (_imageFile != null) {
-          map['profilePhoto'] = await MultipartFile.fromFile(
-            _imageFile!.path,
-            filename: _imageFile!.path.split('/').last,
-          );
-        }
-        return FormData.fromMap(map);
-      }
-
-      // API Call with fallback endpoints/methods.
-      Response<dynamic>? response;
-      final userId = userSession.getCurrentUserId();
-      final endpoints = <String>[
-        '/user/auth/update-profile',
-        '/user/auth/updateProfile',
-        if (userId != null && userId.isNotEmpty)
-          '/user/auth/update-profile/$userId',
-        if (userId != null && userId.isNotEmpty)
-          '/user/auth/updateProfile/$userId',
-      ];
-      final methods = <String>['PUT', 'PATCH'];
-      final multipartOptions = Options(contentType: 'multipart/form-data');
-
-      for (final endpoint in endpoints) {
-        for (final method in methods) {
-          try {
-            response = method == 'PUT'
-                ? await apiClient.put(
-                    endpoint,
-                    data: await buildFormData(),
-                    options: multipartOptions,
-                  )
-                : await apiClient.dio.patch(
-                    endpoint,
-                    data: await buildFormData(),
-                    options: multipartOptions,
-                  );
-            break;
-          } on DioException catch (e) {
-            if (e.response?.statusCode == 404 ||
-                e.response?.statusCode == 405) {
-              continue;
-            }
-            rethrow;
-          }
-        }
-        if (response != null) break;
-      }
-
-      if (response == null) {
-        // If profile route is missing but image upload succeeded, still sync UI/session.
-        if (uploadedProfilePath != null && uploadedProfilePath.isNotEmpty) {
-          await userSession.updateeProfile(
-            fullName: _nameController.text.trim(),
-            mobileNumber: _mobileNumberController.text.trim(),
-            profilePicture: uploadedProfilePath,
-          );
-          if (mounted) {
-            setState(() {
-              _imageVersion = DateTime.now().millisecondsSinceEpoch;
-            });
-            _showSuccessToast('Profile photo updated');
-            Navigator.pop(context, {
-              'fullName': _nameController.text.trim(),
-              'mobileNumber': _mobileNumberController.text.trim(),
-              'profilePicture': uploadedProfilePath,
-            });
-          }
-          return;
-        }
-        throw DioException(
-          requestOptions: RequestOptions(path: endpoints.join(', ')),
-          message: 'Update profile endpoint not found on server',
-        );
-      }
-
-      if (response.statusCode == 200) {
-        final responseData = response.data is Map<String, dynamic>
-            ? response.data as Map<String, dynamic>
-            : <String, dynamic>{};
-        final updatedUser = responseData['data'] is Map<String, dynamic>
-            ? responseData['data'] as Map<String, dynamic>
-            : responseData;
-
-        String fullName =
-            (updatedUser['fullName'] ?? updatedUser['name'])?.toString() ??
-            _nameController.text.trim();
-        String mobileNumber =
-            updatedUser['mobileNumber']?.toString() ??
-            _mobileNumberController.text.trim();
-        String? profilePicture =
-            (updatedUser['profilePicture'] ??
-                    updatedUser['profilePhoto'] ??
-                    updatedUser['imageUrl'])
-                ?.toString();
-
-        if (profilePicture == null || profilePicture.isEmpty) {
-          try {
-            final whoamiResponse = await apiClient.get(ApiEndpoints.whoami);
-            final whoamiData = whoamiResponse.data is Map<String, dynamic>
-                ? whoamiResponse.data as Map<String, dynamic>
-                : <String, dynamic>{};
-            final whoamiUser = whoamiData['data'] is Map<String, dynamic>
-                ? whoamiData['data'] as Map<String, dynamic>
-                : whoamiData;
-            profilePicture =
-                (whoamiUser['profilePicture'] ??
-                        whoamiUser['profilePhoto'] ??
-                        whoamiUser['imageUrl'])
-                    ?.toString();
-            fullName =
-                (whoamiUser['fullName'] ?? whoamiUser['name'])?.toString() ??
-                fullName;
-            mobileNumber =
-                whoamiUser['mobileNumber']?.toString() ?? mobileNumber;
-          } catch (_) {}
-        }
-
-        // 3. Update local storage so other screens reflect changes
-        await userSession.updateeProfile(
-          fullName: fullName,
-          mobileNumber: mobileNumber,
-          profilePicture: profilePicture,
-        );
-        if (mounted) {
-          setState(() {
-            _imageVersion = DateTime.now().millisecondsSinceEpoch;
-          });
-        }
-
-        if (mounted) {
-          _showSuccessToast('Profile updated successfully');
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Profile Updated Successfully!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          Navigator.pop(context, {
-            'fullName': fullName,
-            'mobileNumber': mobileNumber,
-            'profilePicture': profilePicture,
-          });
-        }
-      }
-    } on DioException catch (e) {
-      debugPrint("DIO ERROR: ${e.response?.data ?? e.message}");
-      final responseData = e.response?.data;
-      String message = "Failed to update profile";
-      if (responseData is Map && responseData['message'] != null) {
-        message = responseData['message'].toString();
-      } else if (responseData is String && responseData.trim().isNotEmpty) {
-        message = responseData.contains('Cannot PUT')
-            ? 'Update endpoint not found on server (PUT)'
-            : responseData;
-      } else if (e.message != null && e.message!.isNotEmpty) {
-        message = e.message!;
-      }
-      if (mounted) {
+    result.fold(
+      (failure) {
+        if (!mounted) return;
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(message), backgroundColor: Colors.red),
+          SnackBar(content: Text(failure.message), backgroundColor: Colors.red),
         );
-      }
-    } finally {
-      if (mounted) setState(() => _isLoading = false);
-    }
+      },
+      (updatedProfile) {
+        if (!mounted) return;
+        setState(() {
+          _imageVersion = DateTime.now().millisecondsSinceEpoch;
+        });
+        _showSuccessToast('Profile updated successfully');
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Profile Updated Successfully!'),
+            backgroundColor: Colors.green,
+          ),
+        );
+        Navigator.pop(context, {
+          'fullName': updatedProfile.fullName,
+          'mobileNumber': updatedProfile.mobileNumber,
+          'profilePicture': updatedProfile.profilePicture,
+        });
+      },
+    );
+
+    if (mounted) setState(() => _isLoading = false);
   }
 
   // --- UI COMPONENTS ---
@@ -503,7 +324,8 @@ class _EditProfileScreenState extends ConsumerState<EditProfileScreen> {
               backgroundImage: _imageFile != null
                   ? FileImage(_imageFile!)
                   : (serverImageUrl != null
-                            ? NetworkImage(serverImageUrl)
+                            ? CachedNetworkImageProvider(serverImageUrl)
+                            // NetworkImage(serverImageUrl)
                             : null)
                         as ImageProvider?,
               child: (_imageFile == null && serverImageUrl == null)

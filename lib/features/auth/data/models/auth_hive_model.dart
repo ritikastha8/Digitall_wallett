@@ -6,26 +6,35 @@ import 'package:uuid/uuid.dart';
 part 'auth_hive_model.g.dart';
 
 @HiveType(typeId: HiveTableConstant.authTypeId)
-class AuthHiveModel {
+class AuthHiveModel extends HiveObject {
   @HiveField(0)
   final String? authId;
   @HiveField(1)
   final String fullName;
   @HiveField(2)
   final String mobileNumber;
+  @HiveField(3)
+  final String email;
   // @HiveField(3)
   // final String username;
-  @HiveField(3)
-  final String? password;
   @HiveField(4)
+  final String? password;
+  @HiveField(6)
+  final String? confirmPassword;
+  // @HiveField(7)
+  // final String role;
+  @HiveField(7)
   final String? profilePicture;
 
   AuthHiveModel({
     String? authId,
     required this.fullName,
     required this.mobileNumber,
+    required this.email,
     // required this.username,
     this.password,
+    this.confirmPassword,
+    // this.role = "user",
     this.profilePicture,
   }) : authId = authId ?? Uuid().v4();
 
@@ -36,7 +45,10 @@ class AuthHiveModel {
       fullName: entity.fullName,
       mobileNumber: entity.mobileNumber,
       // username: entity.username,
+      email: entity.email,
       password: entity.password,
+      confirmPassword: entity.confirmPassword,
+      // role: entity.role,
       profilePicture: entity.profilePicture,
     );
   }
@@ -47,7 +59,10 @@ class AuthHiveModel {
       fullName: fullName,
       mobileNumber: mobileNumber,
       // username: username,
+      email: email,
       password: password,
+      confirmPassword: confirmPassword,
+      // role: role,
       profilePicture: profilePicture,
     );
   }

@@ -10,7 +10,7 @@ final dashboardViewModelProvider =
     );
 
 class DashboardViewModel extends Notifier<DashboardState> {
-  late final uploadPhotoUsecase _uploadPhotoUsecase;
+  late final UploadPhotoUsecase _uploadPhotoUsecase;
 
   @override
   DashboardState build() {

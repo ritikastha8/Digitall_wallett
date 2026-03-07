@@ -1,12 +1,14 @@
 import 'package:digital_wallett_system/features/dashboard/presentation/pages/bottom_pages/home_screen.dart';
-import 'package:digital_wallett_system/screens/bottom_screen/home_screen.dart';
-import 'package:digital_wallett_system/screens/bottom_screen/profile_screen.dart';
-import 'package:digital_wallett_system/screens/bottom_screen/transaction_screen.dart';
 
+import 'package:digital_wallett_system/features/transactions/presentation/pages/transaction_list_page.dart';
+import 'package:digital_wallett_system/features/dashboard/presentation/pages/bottom_pages/profile_screen.dart';
+// features/dashboard/presentation/pages/bottom_pages/profile_screen.dart
 import 'package:flutter/material.dart';
 
 class BottomnavigationScreen extends StatefulWidget {
-  const BottomnavigationScreen({super.key});
+  final int initialIndex;
+
+  const BottomnavigationScreen({super.key, this.initialIndex = 0});
 
   @override
   State<BottomnavigationScreen> createState() => _BottomnavigationScreenState();
@@ -15,11 +17,17 @@ class BottomnavigationScreen extends StatefulWidget {
 class _BottomnavigationScreenState extends State<BottomnavigationScreen> {
   //
   int _selectedIndex = 0;
-  List<Widget> lstBottomScreen = [
+  final List<Widget> lstBottomScreen = [
     const HomesScreen(),
-    const TransactionScreen(),
+    const TransactionListPage(),
     const ProfileScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.initialIndex.clamp(0, lstBottomScreen.length - 1);
+  }
 
   @override
   Widget build(BuildContext context) {

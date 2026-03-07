@@ -1,11 +1,12 @@
+import 'package:digital_wallett_system/app/routes/app_routes.dart';
+import 'package:digital_wallett_system/app/theme/theme_extensions.dart';
+import 'package:digital_wallett_system/core/services/storage/user_session_service.dart';
+import 'package:digital_wallett_system/features/auth/presentation/pages/login_page.dart';
+import 'package:digital_wallett_system/features/dashboard/presentation/pages/bottom_pages/bottomnavigation_screen.dart';
+import 'package:digital_wallett_system/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_svg/flutter_svg.dart';
-
-import '../../../../app/routes/app_routes.dart';
-import '../../../../app/theme/app_colors.dart';
-import '../../../../app/theme/theme_extensions.dart';
-import '../../../onboarding/presentation/pages/onboarding_page.dart';
 
 class SplashPage extends ConsumerStatefulWidget {
   const SplashPage({super.key});
@@ -59,7 +60,14 @@ class _SplashPageState extends ConsumerState<SplashPage>
   Future<void> _navigateNext() async {
     await Future.delayed(const Duration(seconds: 2));
     if (!mounted) return;
-    AppRoutes.pushReplacement(context, const OnboardingPage());
+    final session = ref.read(userSessionServiceProvider);
+    if (session.isLoggedIn()) {
+      AppRoutes.pushReplacement(context, const BottomnavigationScreen());
+    } else if (session.getHasSeenOnboarding()) {
+      AppRoutes.pushReplacement(context, const LoginPage());
+    } else {
+      AppRoutes.pushReplacement(context, const OnboardingPage());
+    }
   }
 
   @override
